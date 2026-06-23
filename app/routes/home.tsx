@@ -1,5 +1,10 @@
 import type { Route } from "./+types/home";  
-import Navbar from "../../components/Navbar"
+import { ArrowRight, Layers } from "lucide-react";
+import { useOutletContext } from "react-router";
+import Navbar from "~/component/Navbar";
+import Button from "~/component/ui/Button";
+import Upload from "~/component/Upload";
+
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -9,10 +14,81 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Home() {
+  const { isSignedIn } = useOutletContext<AuthContext>();
+
   return (
     <div className="home">
        <Navbar />
-       <h1 className="text-3xl" text-indigo-700 font-extrabold">Home</h1>   
+      
+      <section className="hero">
+         <div className="announce">
+           <div className="dot">
+               <div className="pulse"></div>
+           </div>
+
+           <p>Introducing Roomif 2.0</p>
+
+         </div>
+         <h1>BUILD BEAUTIFUL SPACES AT THE SPEE OF THOUGHT WITH ROOMIFY</h1>
+
+         <p className="subtitle">
+           ROOMIFY IS AN AI-FIRST DESIGN ENVIRONMENT THAT HELPS YOU RENDER, VISUALIZE AND SHIP ARCHITECTURAL PROJECTS FASTER THAN EVER.
+         </p> 
+         
+
+         <div className="actions">
+           <a href='#upload' className="cta">
+              Start building <ArrowRight className="icon"/>
+           </a>
+
+           <Button variant="secondary" size="lg" className="demo">
+             Watch Demo
+           </Button>
+         </div>
+
+         <div id="upload" className="upload-shell">
+           <Upload isSignedIn={isSignedIn} onComplete={(base64) => {
+             console.log("Upload complete", base64.slice(0, 100));
+           }} />
+         </div>
+      </section>
+
+      <section className="projects">
+         <div className="section-inner">
+           <div className="section-head"></div>
+            <div className="copy">
+              <h2>Projects</h2>
+              <p>Your latest work and shared ccommunity projects all in one place.</p>
+            </div>
+
+            <div className="projects-grid">
+               <div className="project-card group">
+                  <div className="preview"></div>
+                     <img src="https://roomify-mlhuk267-dfwu1i.puter.site/projects/1770803585402/rendered.png" alt="Project" />
+                     <div className="badge">
+                       <span>Community</span>
+                     </div>
+               </div>
+               <div className="card-body">
+                     <div>
+                       <h3>PROJECT MANHATTAN</h3>
+
+                       <div className="meta">
+                           <Clock size={12} />
+                           <span>{new Date('01.01.2027').toLocaleDateString()}</span>
+                           <span>
+                            By JS Mastery
+                           </span>
+                       </div>
+                     </div>
+                     <div className="arrow">
+                        <ArrowUpRight size={18} />                     
+
+               </div>
+
+            </div>
+         </div>
+      </section>
     </div>
   )
 }

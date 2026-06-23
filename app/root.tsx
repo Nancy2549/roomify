@@ -5,13 +5,12 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-  useSearchParams,
 } from "react-router";
 
 import type { Route } from "./+types/root";
 import "./app.css";
 import { getCurrentUser, signIn, signOut } from "../lib/puter.action";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },

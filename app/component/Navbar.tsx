@@ -48,7 +48,7 @@ const Navbar = () => {
         {isSignedIn ? (
           <>
             <span className="greeting">
-                {username ? `Hi, ${username}` : 'Signed in'}
+                {userName ? `Hi, ${userName}` : 'Signed in'}
             </span>
 
             <Button size="sm" onClick={handleAuthClick} className="btn">
@@ -70,3 +70,5 @@ const Navbar = () => {
 </header>
    )
 }
+
+export default Navbar;
