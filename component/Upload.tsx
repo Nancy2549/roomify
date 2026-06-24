@@ -1,5 +1,5 @@
-import { useRef, useState } from "react";
-import { PROGRESS_INCREMENT, PROGRESS_INTERVAL_MS, REDIRECT_DELAY_MS } from "../../lib/constants";
+import { useRef, useState, type ChangeEvent, type DragEvent } from "react";
+import { PROGRESS_INCREMENT, PROGRESS_INTERVAL_MS, REDIRECT_DELAY_MS } from "../lib/constants";
 
 type UploadProps = {
   isSignedIn: boolean;
@@ -20,7 +20,7 @@ export default function Upload({ isSignedIn, onComplete }: UploadProps) {
 
     const reader = new FileReader();
 
-    reader.onload = () => {
+    reader.onloadend = () => {
       const base64 = reader.result as string;
       setProgress(0);
       setStatusMessage("Uploading...");
@@ -54,29 +54,29 @@ export default function Upload({ isSignedIn, onComplete }: UploadProps) {
     processFile(files[0]);
   };
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     handleFiles(event.target.files);
   };
 
-  const handleDragEnter = (event: React.DragEvent<HTMLDivElement>) => {
+  const handleDragEnter = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     event.stopPropagation();
     if (!isSignedIn) return;
     setIsDragging(true);
   };
 
-  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+  const handleDragOver = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     event.stopPropagation();
   };
 
-  const handleDragLeave = (event: React.DragEvent<HTMLDivElement>) => {
+  const handleDragLeave = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     event.stopPropagation();
     setIsDragging(false);
   };
 
-  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+  const handleDrop = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     event.stopPropagation();
     setIsDragging(false);
