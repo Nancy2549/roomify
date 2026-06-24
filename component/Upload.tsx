@@ -20,7 +20,7 @@ export default function Upload({ isSignedIn, onComplete }: UploadProps) {
 
     const reader = new FileReader();
 
-    reader.onload = () => {
+    reader.onloadend = () => {
       const base64 = reader.result as string;
       setProgress(0);
       setStatusMessage("Uploading...");

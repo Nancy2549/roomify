@@ -74,7 +74,7 @@ export default function Home() {
                    <h3>PROJECT MANHATTAN</h3>
 
                    <div className="meta">
-                     <span>{new Date("01.01.2027").toLocaleDateString()}</span>
+                     <span>{new Date(2027, 0, 1).toLocaleDateString()}</span>
                      <span>By JS Mastery</span>
                    </div>
                  </div>

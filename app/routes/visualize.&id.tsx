@@ -1,7 +1,10 @@
-import {type RouteConfig, index, route} from "@react-router/dev/routes";
 import type { Route } from "../+types/root";
 
-export default [
-    index("routes/home.tsx"),
-    route('visualizer/:id','./routes/visualizer.$id.tsx')
-] satisfies RouteConfig;
+export default function Visualize({ params }: Route.ComponentProps) {
+  return (
+    <div>
+      <h1>Visualizer {"params.id"}</h1>
+    </div>
+  );
+}
+
