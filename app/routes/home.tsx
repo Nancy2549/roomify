@@ -1,9 +1,9 @@
 import type { Route } from "./+types/home";  
-import { ArrowRight, Layers } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useOutletContext } from "react-router";
-import Navbar from "~/component/Navbar";
-import Button from "~/component/ui/Button";
-import Upload from "~/component/Upload";
+import Navbar from "../../component/Navbar";
+import Button from "../../component/ui/Button";
+import Upload from "../../component/Upload";
 
 
 export function meta({}: Route.MetaArgs) {
@@ -58,34 +58,30 @@ export default function Home() {
            <div className="section-head"></div>
             <div className="copy">
               <h2>Projects</h2>
-              <p>Your latest work and shared ccommunity projects all in one place.</p>
+              <p>Your latest work and shared community projects all in one place.</p>
             </div>
 
             <div className="projects-grid">
                <div className="project-card group">
-                  <div className="preview"></div>
-                     <img src="https://roomify-mlhuk267-dfwu1i.puter.site/projects/1770803585402/rendered.png" alt="Project" />
-                     <div className="badge">
-                       <span>Community</span>
-                     </div>
+                  <div className="preview" />
+                  <img src="https://roomify-mlhuk267-dfwu1i.puter.site/projects/1770803585402/rendered.png" alt="Project" />
+                  <div className="badge">
+                    <span>Community</span>
+                  </div>
                </div>
                <div className="card-body">
-                     <div>
-                       <h3>PROJECT MANHATTAN</h3>
+                 <div>
+                   <h3>PROJECT MANHATTAN</h3>
 
-                       <div className="meta">
-                           <Clock size={12} />
-                           <span>{new Date('01.01.2027').toLocaleDateString()}</span>
-                           <span>
-                            By JS Mastery
-                           </span>
-                       </div>
-                     </div>
-                     <div className="arrow">
-                        <ArrowUpRight size={18} />                     
-
+                   <div className="meta">
+                     <span>{new Date("01.01.2027").toLocaleDateString()}</span>
+                     <span>By JS Mastery</span>
+                   </div>
+                 </div>
+                 <div className="arrow">
+                   <ArrowRight size={18} />
+                 </div>
                </div>
-
             </div>
          </div>
       </section>
