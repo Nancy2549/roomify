@@ -13,50 +13,48 @@ export const getCurrentUser = async () => {
     }
 }
 
-export const createProject = async ({item}: CreateProjectParams): Promise<DesignItem | null | undefined> => {
-    Promise<DesignItem | null |undefined> => {
-       const projectId = item.id;
+export const createProject = async ({ item }: CreateProjectParams): Promise<DesignItem | null> => {
+    const projectId = item.id;
 
-       const hosting = await getOrCreateHostingConfig();
+    const hosting = await getOrCreateHostingConfig();
 
-       const hostedSource = projectId ? 
-        await uploadImageToHosting({
-            hosting, url:  item.sourceImage, projectId, label: 'source',
-        }) : null;
+    const hostedSource = projectId
+        ? await uploadImageToHosting({ hosting, url: item.sourceImage, projectId, label: "source" })
+        : null;
 
-        const hostedRender = projectId && item.renderedImage ?
-            await uploadImageToHosting({
-                hosting, url: item.renderedImage, projectId, label: 'rendered',
-            }) : null;
+    const hostedRender = projectId && item.renderedImage
+        ? await uploadImageToHosting({ hosting, url: item.renderedImage, projectId, label: "rendered" })
+        : null;
 
-        const resolvedSource = hostedSource?.url ||| (isHostedUrl(item.sourceImage) ? item.sourceImage:  '');       
+    const resolvedSource = hostedSource?.url || (isHostedUrl(item.sourceImage) ? item.sourceImage : "");
 
-        if(!resolvedSource) {
-            console.warn('Failed to host source image, skipping save.')
-            return null;
-        }
-
-        const resolvedRender = hostedRender?.url ? hostedRender?.url : item.renderedImage && isHostedUrl(item.renderedImage) ? item.renderedImage: undefined;
-
-        const {
-            sourcePath: _sourcePath,
-            renderedPath: _renderedPath,
-            publicPath: _publicPath,
-            ...rest
-         } =  item;
-
-         const payload = {
-            ...rest,
-            sourceImage: resolvedSource,
-            renderedImage: resolvedRender,
-         }
-
-         try{
-
-           return payload;
-         } catch (e) {
-            console.log('Failed to save project', e)
-            return null;
-         }
+    if (!resolvedSource) {
+        console.warn("Failed to host source image, skipping save.");
+        return null;
     }
+
+    const resolvedRender = hostedRender?.url ? hostedRender.url : item.renderedImage && isHostedUrl(item.renderedImage) ? item.renderedImage : undefined;
+
+    const { sourcePath: _sourcePath, renderedPath: _renderedPath, publicPath: _publicPath, ...rest } = item;
+
+    const payload: DesignItem = {
+        ...rest,
+        id: item.id,
+        name: item.name,
+        sourceImage: resolvedSource,
+        renderedImage: resolvedRender ?? null,
+        timestamp: item.timestamp || Date.now(),
+        ownerId: item.ownerId ?? null,
+        sharedBy: item.sharedBy ?? null,
+        sharedAt: item.sharedAt ?? null,
+        isPublic: item.isPublic ?? false,
+    };
+
+    try {
+        return payload;
+    } catch (e) {
+        console.log("Failed to save project", e);
+        return null;
+    }
+};
 
