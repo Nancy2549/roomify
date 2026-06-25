@@ -52,37 +52,39 @@ const DEFAULT_AUTH_STATE: AuthState = {
 export default function App() {
    const [authState, setAuthState] = useState<AuthState>(DEFAULT_AUTH_STATE);
 
-   const refreshAuth = async () =>{
-     try{
-         const user = await getCurrentUser();
+  const refreshAuth = async () => {
+    try {
+      const user = await getCurrentUser();
 
-         setAuthState({
-              isSignedIn: !!user,
-              userName: user?.username || null,
-              userId:user?.uuid || null,
-         });
+      setAuthState({
+        isSignedIn: !!user,
+        userName: user?.username || null,
+        userId: user?.uuid || null,
+      });
 
-         return !!user;
-     } catch{
-          setAuthState(DEFAULT_AUTH_STATE);
-          return false;
-     }
-     useEffect(() =>{
-         refreshAuth();
+      return !!user;
+    } catch {
+      setAuthState(DEFAULT_AUTH_STATE);
+      return false;
+    }
+  };
 
-     }, []);
-   }
-  return(
-        <main className="min-h-screen bg-background text-foreground relative z-10">
-           <Outlet
-               context={{
-                 ...authState, refreshAuth, signIn, signOut
-               }}
-           
-           />;
-        </main>
+  useEffect(() => {
+    refreshAuth();
+  }, []);
 
-  )
+  return (
+    <main className="min-h-screen bg-background text-foreground relative z-10">
+      <Outlet
+        context={{
+          ...authState,
+          refreshAuth,
+          signIn,
+          signOut,
+        }}
+      />
+    </main>
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {

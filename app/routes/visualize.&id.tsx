@@ -1,10 +1,26 @@
-import type { Route } from "../+types/root";
+import { useLocation } from "react-router";
 
-export default function Visualize({ params }: Route.ComponentProps) {
+const VisualizerId = () => {
+  const location = useLocation();
+  const state = (location.state as any) || {};
+  const initialImage = state.initialImage as string | undefined;
+  const name = state.name as string | undefined;
+
   return (
-    <div>
-      <h1>Visualizer {"params.id"}</h1>
-    </div>
+    <section>
+      <h1>{name || "Untitled Project"}</h1>
+
+      <div className="visualizer">
+        {initialImage && (
+          <div className="image-container">
+            <h2>Source Image</h2>
+            <img src={initialImage} alt="source" />
+          </div>
+        )}
+      </div>
+    </section>
   );
-}
+};
+
+export default VisualizerId;
 
