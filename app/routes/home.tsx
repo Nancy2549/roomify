@@ -14,7 +14,7 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Home() {
-  const { isSignedIn } = useOutletContext<AuthContext>();
+
 
   return (
     <div className="home">
