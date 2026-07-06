@@ -4,7 +4,7 @@ import {ArrowRight, ArrowUpRight, Clock, Layers} from "lucide-react";
 import Button from "../../component/ui/Button";
 import Upload from "../../component/Upload";
 import {useNavigate} from "react-router";
-import {useEffect, useRef, useState} from "react";
+import {type KeyboardEvent, useEffect, useRef, useState} from "react";
 import {createProject, getProjects} from "../../lib/puter.action";
 
 export function meta({}: Route.MetaArgs) {
@@ -20,10 +20,13 @@ export default function Home() {
     const isCreatingProjectRef = useRef(false);
 
     const handleUploadComplete = async (base64Image: string) => {
-        try {
+        if (isCreatingProjectRef.current) return false;
 
-            if(isCreatingProjectRef.current) return false;
-            isCreatingProjectRef.current = true;
+        let shouldReleaseLock = false;
+        isCreatingProjectRef.current = true;
+        shouldReleaseLock = true;
+
+        try {
             const newId = Date.now().toString();
             const name = `Residence ${newId}`;
 
@@ -35,7 +38,7 @@ export default function Home() {
 
             const saved = await createProject({ item: newItem, visibility: 'private' });
 
-            if(!saved) {
+            if (!saved) {
                 console.error("Failed to create project");
                 return false;
             }
@@ -52,9 +55,18 @@ export default function Home() {
 
             return true;
         } finally {
-            isCreatingProjectRef.current = false;
+            if (shouldReleaseLock) {
+                isCreatingProjectRef.current = false;
+            }
         }
     }
+
+    const handleProjectKeyDown = (event: KeyboardEvent<HTMLDivElement>, projectId: string) => {
+        if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            navigate(`/visualizer/${projectId}`);
+        }
+    };
 
     useEffect(() => {
         let isMounted = true;
@@ -132,33 +144,44 @@ export default function Home() {
                   </div>
 
                   <div className="projects-grid">
-                      {projects.map(({id, name, renderedImage, sourceImage, timestamp}) => (
-                          <div key={id} className="project-card group" onClick={() => navigate(`/visualizer/${id}`)}>
-                              <div className="preview">
-                                  <img  src={renderedImage || sourceImage} alt="Project"
-                                  />
+                      {projects.map(({id, name, renderedImage, sourceImage, timestamp, isPublic, ownerId}) => {
+                          const badgeLabel = isPublic ? "Public" : "Private";
+                          const ownerLabel = ownerId ? "Owned project" : "Private upload";
 
-                                  <div className="badge">
-                                      <span>Community</span>
-                                  </div>
-                              </div>
+                          return (
+                              <div
+                                  key={id}
+                                  className="project-card group"
+                                  role="button"
+                                  tabIndex={0}
+                                  onClick={() => navigate(`/visualizer/${id}`)}
+                                  onKeyDown={(event) => handleProjectKeyDown(event, id)}
+                              >
+                                  <div className="preview">
+                                      <img src={renderedImage || sourceImage} alt="Project" />
 
-                              <div className="card-body">
-                                  <div>
-                                      <h3>{name}</h3>
-
-                                      <div className="meta">
-                                          <Clock size={12} />
-                                          <span>{new Date(timestamp).toLocaleDateString()}</span>
-                                          <span>By JS Mastery</span>
+                                      <div className="badge">
+                                          <span>{badgeLabel}</span>
                                       </div>
                                   </div>
-                                  <div className="arrow">
-                                      <ArrowUpRight size={18} />
+
+                                  <div className="card-body">
+                                      <div>
+                                          <h3>{name}</h3>
+
+                                          <div className="meta">
+                                              <Clock size={12} />
+                                              <span>{new Date(timestamp).toLocaleDateString()}</span>
+                                              <span>{ownerLabel}</span>
+                                          </div>
+                                      </div>
+                                      <div className="arrow">
+                                          <ArrowUpRight size={18} />
+                                      </div>
                                   </div>
                               </div>
-                          </div>
-                      ))}
+                          );
+                      })}
                   </div>
               </div>
           </section>

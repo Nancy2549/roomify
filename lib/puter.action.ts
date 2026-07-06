@@ -14,12 +14,13 @@ export const getCurrentUser = async () => {
     }
 }
 
-export const createProject = async ({ item, visibility= "private" }: CreateProjectParams): Promise<DesignItem | null| undefined> => {
+export const createProject = async ({ item, visibility = "private" }: CreateProjectParams): Promise<DesignItem | null| undefined> => {
     if(!PUTER_WORKER_URL) {
         console.warn("Missing VITE_PUTER_WORKER_URL; Skip project save;");
         return null;
     }
     const projectId = item.id;
+    const resolvedVisibility = visibility ?? "private";
 
     const hosting = await getOrCreateHostingConfig();
 
@@ -52,7 +53,7 @@ export const createProject = async ({ item, visibility= "private" }: CreateProje
         ownerId: item.ownerId ?? null,
         sharedBy: item.sharedBy ?? null,
         sharedAt: item.sharedAt ?? null,
-        isPublic: item.isPublic ?? false,
+        isPublic: resolvedVisibility === "public",
     };
 
     try {
@@ -62,7 +63,7 @@ export const createProject = async ({ item, visibility= "private" }: CreateProje
             method: 'POST',headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ project: payload, visibility: item.isPublic ? "public" : "private" }),
+            body: JSON.stringify({ project: payload, visibility: resolvedVisibility }),
         });
        
         if(!response.ok) {  
@@ -70,9 +71,9 @@ export const createProject = async ({ item, visibility= "private" }: CreateProje
              return null;
         }
 
-        const data = (await response.json()) as { project?: DesignItem[] | null };
+        const data = (await response.json()) as { project?: DesignItem | null };
 
-        return data.project?.[0] ?? null;
+        return data.project ?? null;
     } catch (e) {
         console.log("Failed to save project", e);
         return null;

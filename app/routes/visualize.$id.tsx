@@ -39,10 +39,8 @@ const VisualizerId = () => {
             // TODO: Implement 3D view generation
             const result = { renderedImage: null, renderedPath: null };
 
-            if(result.renderedImage) {
+            if (result.renderedImage) {
                 setCurrentImage(result.renderedImage);
-
-            
 
                 const updatedItem = {
                     ...item,
@@ -53,12 +51,15 @@ const VisualizerId = () => {
                     isPublic: item.isPublic ?? false,
                 }
 
-                const saved = await createProject({ item: updatedItem, visibility: "private" })
+                const saved = await createProject({ item: updatedItem, visibility: updatedItem.isPublic ? "public" : "private" })
 
-                if(saved) {
+                if (saved) {
                     setProject(saved);
                     setCurrentImage(saved.renderedImage || result.renderedImage);
                 }
+            } else {
+                console.warn("Generation is not available for this project.");
+                setCurrentImage(item.sourceImage || null);
             }
         } catch (error) {
             console.error('Generation failed: ', error)
