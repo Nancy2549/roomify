@@ -15,8 +15,10 @@ Promise<HostingConfig | null> => {
       try {
           const created = await puter.hosting.create(subdomain, '.');
 
-          return { subdomain: created.subdomain };
-
+          const record = { subdomain: created.subdomain};
+          
+          await puter.kv.set(HOSTING_CONFIG_KEY, record);
+          return record;
       }catch (e){
             console.warn(`Could not find subdomain: ${e}`);
             return null;
@@ -53,10 +55,13 @@ export const uploadImageToHosting = async ({ hosting, url, projectId, label}: St
     await puter.fs.write(filePath, uploadFile);
 
     const hostedUrl = getHostedUrl({ subdomain: hosting.subdomain }, filePath);
+    if (hostedUrl) {
+      return { url: hostedUrl };
+    }
     } catch (e) {
       console.warn(`Failed to store hosted image: ${e}`);
       return null;
     }
-  // If hosting succeeded return the hosted URL, otherwise null
+
   return null;
 }
