@@ -1,4 +1,4 @@
-export function fetchdataurl(url: string): Promise<string> {
+export function fetchDataUrl(url: string): Promise<string> {
   return fetch(url)
     .then(async (response) => {
       if (!response.ok) {
