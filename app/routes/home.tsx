@@ -158,7 +158,7 @@ export default function Home() {
                                   onKeyDown={(event) => handleProjectKeyDown(event, id)}
                               >
                                   <div className="preview">
-                                      <img src={renderedImage || sourceImage} alt="Project" />
+                                      <img src={renderedImage || sourceImage} alt={`${name} preview`} />
 
                                       <div className="badge">
                                           <span>{badgeLabel}</span>

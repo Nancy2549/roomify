@@ -19,13 +19,15 @@ const getLocalProjects = (): DesignItem[] => {
     }
 };
 
-const saveLocalProjects = (projects: DesignItem[]) => {
-    if (!isBrowser) return;
+const saveLocalProjects = (projects: DesignItem[]): boolean => {
+    if (!isBrowser) return false;
 
     try {
         window.localStorage.setItem(LOCAL_PROJECTS_KEY, JSON.stringify(projects));
-    } catch {
-        // ignore write failures
+        return true;
+    } catch (error) {
+        console.error("Failed to persist projects locally", error);
+        return false;
     }
 };
 
@@ -65,7 +67,13 @@ export const createProject = async ({ item, visibility = "private" }: CreateProj
     if (!canUseRemoteStorage) {
         const stored = getLocalProjects();
         const next = [localPayload, ...stored.filter((project) => project.id !== localPayload.id)];
-        saveLocalProjects(next);
+        const saved = saveLocalProjects(next);
+
+        if (!saved) {
+            console.warn("Project was not persisted locally; storage write failed.");
+            return null;
+        }
+
         return localPayload;
     }
 

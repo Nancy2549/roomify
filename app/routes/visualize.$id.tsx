@@ -43,18 +43,22 @@ const VisualizerId = () => {
 
         try {
             if (!currentImage.startsWith('data:')) {
-                const response = await fetch(currentImage);
-                if (response.ok) {
-                    const blob = await response.blob();
-                    const blobUrl = URL.createObjectURL(blob);
-                    const link = document.createElement('a');
-                    link.href = blobUrl;
-                    link.download = fileName;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    URL.revokeObjectURL(blobUrl);
-                    return;
+                try {
+                    const response = await fetch(currentImage);
+                    if (response.ok) {
+                        const blob = await response.blob();
+                        const blobUrl = URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.href = blobUrl;
+                        link.download = fileName;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(blobUrl);
+                        return;
+                    }
+                } catch {
+                    // Fall back to the direct download path for hosted or CORS-blocked URLs.
                 }
             }
 
@@ -123,7 +127,7 @@ const VisualizerId = () => {
             if (!isMounted) return;
 
             setProject(fetchedProject || null);
-            setCurrentImage(fetchedProject?.renderedImage || null);
+            setCurrentImage((previousImage) => fetchedProject?.renderedImage || previousImage || null);
             setIsProjectLoading(false);
             hasInitialGenerated.current = false;
         };
