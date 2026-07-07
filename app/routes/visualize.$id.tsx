@@ -1,4 +1,4 @@
-import { useNavigate, useOutletContext, useParams} from "react-router";
+import { useLocation, useNavigate, useOutletContext, useParams} from "react-router";
 import {useEffect, useRef, useState} from "react";
 import {ReactCompareSlider} from "react-compare-slider";
 import {Box, Download, RefreshCcw, Share2, X} from "lucide-react";
@@ -8,6 +8,7 @@ import {createProject, getProjectByID} from "../../lib/puter.action";
 const VisualizerId = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
     const { userId } = useOutletContext<AuthContext>()
 
     const hasInitialGenerated = useRef(false);
@@ -18,16 +19,54 @@ const VisualizerId = () => {
     const [isProcessing, setIsProcessing] = useState(false);
     const [currentImage, setCurrentImage] = useState<string | null>(null);
 
+    useEffect(() => {
+        const initialImage = (location.state as { initialImage?: string | null } | null)?.initialImage;
+        const initialRendered = (location.state as { initialRendered?: string | null } | null)?.initialRendered;
+
+        if (initialImage) {
+            setCurrentImage(initialRendered || initialImage);
+        }
+    }, [location.state]);
+
     const handleBack = () => navigate('/');
-    const handleExport = () => {
+    const handleExport = async () => {
         if (!currentImage) return;
 
-        const link = document.createElement('a');
-        link.href = currentImage;
-        link.download = `roomify-${id || 'design'}.png`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        const safeName = (project?.name || id || 'design')
+            .toString()
+            .trim()
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/(^-|-$)/g, '') || 'design';
+
+        const fileName = `roomify-${safeName}.png`;
+
+        try {
+            if (!currentImage.startsWith('data:')) {
+                const response = await fetch(currentImage);
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const blobUrl = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = blobUrl;
+                    link.download = fileName;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(blobUrl);
+                    return;
+                }
+            }
+
+            const link = document.createElement('a');
+            link.href = currentImage;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } catch (error) {
+            console.error('Failed to export image', error);
+        }
     }
 
     const runGeneration = async (item: DesignItem) => {

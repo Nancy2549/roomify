@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {useOutletContext} from "react-router";
 import {CheckCircle2, ImageIcon, UploadIcon} from "lucide-react";
-import {PROGRESS_INCREMENT, REDIRECT_DELAY_MS, PROGRESS_INTERVAL_MS} from "../lib/constants";
+import {PROGRESS_INCREMENT, REDIRECT_DELAY_MS, PROGRESS_INTERVAL_MS, PUTER_WORKER_URL} from "../lib/constants";
 
 interface UploadProps {
     onComplete?: (base64Data: string) => Promise<boolean | void> | boolean | void;
@@ -18,6 +18,7 @@ const Upload = ({ onComplete }: UploadProps) => {
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const { isSignedIn } = useOutletContext<AuthContext>();
+    const canUpload = isSignedIn || !PUTER_WORKER_URL;
 
     const resetUploadState = useCallback(() => {
         if (intervalRef.current) {
@@ -59,7 +60,7 @@ const Upload = ({ onComplete }: UploadProps) => {
     }, [onComplete, resetUploadState]);
 
     const processFile = useCallback((file: File) => {
-        if (!isSignedIn || file.size > MAX_FILE_SIZE_BYTES || !allowedTypes.includes(file.type)) {
+        if (!canUpload || file.size > MAX_FILE_SIZE_BYTES || !allowedTypes.includes(file.type)) {
             return false;
         }
 
@@ -124,7 +125,7 @@ const Upload = ({ onComplete }: UploadProps) => {
 
     const handleDragOver = (e: React.DragEvent) => {
         e.preventDefault();
-        if (!isSignedIn) return;
+        if (!canUpload) return;
         setIsDragging(true);
     };
 
@@ -136,7 +137,7 @@ const Upload = ({ onComplete }: UploadProps) => {
         e.preventDefault();
         setIsDragging(false);
 
-        if (!isSignedIn) return;
+        if (!canUpload) return;
 
         const droppedFile = e.dataTransfer.files[0];
         if (droppedFile && droppedFile.size <= MAX_FILE_SIZE_BYTES && allowedTypes.includes(droppedFile.type)) {
@@ -145,7 +146,7 @@ const Upload = ({ onComplete }: UploadProps) => {
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (!isSignedIn) return;
+        if (!canUpload) return;
 
         const selectedFile = e.target.files?.[0];
         if (selectedFile && selectedFile.size <= MAX_FILE_SIZE_BYTES && allowedTypes.includes(selectedFile.type)) {
@@ -166,7 +167,7 @@ const Upload = ({ onComplete }: UploadProps) => {
                         type="file"
                         className="drop-input"
                         accept=".jpg,.jpeg,.png,.webp"
-                        disabled={!isSignedIn}
+                        disabled={!canUpload}
                         onChange={handleChange}
                     />
 
@@ -175,9 +176,11 @@ const Upload = ({ onComplete }: UploadProps) => {
                             <UploadIcon size={20} />
                         </div>
                         <p>
-                            {isSignedIn ? (
+                            {canUpload ? (
                                 "Click to upload or just drag and drop"
-                            ): ("Sign in or sign up with Puter to upload")}
+                            ) : (
+                                "Sign in or sign up with Puter to upload"
+                            )}
                         </p>
                         <p className="help">Maximum file size 50 MB.</p>
                     </div>
