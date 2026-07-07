@@ -1,0 +1,3 @@
+/*    /index.html   200
+# Ensure asset fingerprinting still works
+/assets/*  /assets/:splat  200
